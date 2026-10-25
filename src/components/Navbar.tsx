@@ -7,17 +7,18 @@ import {
   Compass,
   MapPin,
   Bookmark,
-  PlusCircle,
   Radio,
   UserCheck,
   ChevronDown,
   Navigation,
-  Database,
   Layers,
   Users,
   Calendar,
   Upload,
   Sparkles,
+  LogOut,
+  Menu,
+  X,
 } from 'lucide-react';
 import { useUser } from '@/lib/context/UserContext';
 import { NCR_CITIES } from '@/lib/utils/geo';
@@ -28,27 +29,59 @@ export default function Navbar() {
     currentUser,
     switchIdentity,
     isOrganizer,
+    isLoggedIn,
+    logout,
     selectedCity,
     setSelectedCity,
     hasLiveLocation,
     requestLiveLocation,
     isLocating,
     savedEventIds,
-    dbConnected,
-    isDemoMode,
   } = useUser();
 
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [personaDropdownOpen, setPersonaDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Don't render full navbar if not logged in
+  if (!isLoggedIn) {
+    return (
+      <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-rose-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-rose-500/20 group-hover:scale-105 transition-transform">
+                <Radio className="w-5 h-5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white leading-none">
+                  Near<span className="text-rose-600 dark:text-rose-500">Vibe</span>
+                </span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 tracking-wider uppercase font-medium mt-0.5">
+                  Hyperlocal Events
+                </span>
+              </div>
+            </Link>
+            <Link
+              href="/login"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-sm shadow-md shadow-rose-500/20 transition-all hover:scale-[1.02]"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   const navLinks = [
     { href: '/', label: 'Explore', icon: Sparkles },
     { href: '/discover', label: 'Discover', icon: Compass },
-    { href: '/capture', label: 'Capture', icon: Upload },
+    ...(isOrganizer ? [{ href: '/capture', label: 'Capture', icon: Upload }] : []),
     { href: '/squadup', label: 'SquadUp', icon: Users },
     { href: '/planner', label: 'Planner', icon: Calendar },
     { href: '/saved', label: 'Saved', icon: Bookmark, badge: savedEventIds.length },
-    { href: '/organizer', label: 'Organizer', icon: Layers },
+    ...(isOrganizer ? [{ href: '/organizer', label: 'Organizer', icon: Layers }] : []),
   ];
 
   return (
@@ -60,7 +93,7 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 via-rose-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-rose-500/20 group-hover:scale-105 transition-transform">
-                <Radio className="w-5 h-5 animate-pulse" />
+                <Radio className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white leading-none">
@@ -162,25 +195,17 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right actions: Persona switcher, DB status, Create Event CTA */}
+          {/* Right actions: Persona switcher, Logout */}
           <div className="flex items-center gap-3">
-            
-            {/* Database / Demo Badge */}
-            <div
-              title={
-                dbConnected
-                  ? 'Connected to Live Neon PostgreSQL Database'
-                  : 'Running in Local Persistent Demo Mode'
-              }
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${
-                dbConnected
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
-                  : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800'
-              }`}
-            >
-              <Database className="w-3 h-3" />
-              <span>{dbConnected ? 'Neon DB' : 'Demo Mode'}</span>
-            </div>
+
+            {/* Role pill */}
+            <span className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
+              isOrganizer
+                ? 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-800'
+                : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+            }`}>
+              {isOrganizer ? '🏢 Organizer' : '🎓 Candidate'}
+            </span>
 
             {/* Persona Switcher Dropdown */}
             <div className="relative">
@@ -218,10 +243,10 @@ export default function Navbar() {
                 >
                   <div className="px-3.5 py-1.5 border-b border-zinc-100 dark:border-zinc-800">
                     <p className="text-xs font-semibold text-zinc-900 dark:text-white">
-                      Instant Persona Switcher
+                      Switch Account
                     </p>
                     <p className="text-[11px] text-zinc-500">
-                      Test both sides of NearVibe instantly
+                      Test both sides of NearVibe
                     </p>
                   </div>
 
@@ -240,7 +265,7 @@ export default function Navbar() {
                       <span className="w-2 h-2 rounded-full mt-1.5 bg-rose-500 shrink-0" />
                       <div>
                         <p className="font-semibold text-zinc-900 dark:text-white">
-                          Aarav Sharma (Attendee)
+                          🎓 Aarav Sharma (Candidate)
                         </p>
                         <p className="text-[11px] text-zinc-500">
                           Student builder, AI & Hackathons
@@ -255,83 +280,86 @@ export default function Navbar() {
                       }}
                       className={`w-full text-left p-2.5 rounded-lg flex items-start gap-2.5 text-xs transition-colors ${
                         currentUser.role === 'organizer'
-                          ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-950 dark:text-rose-200 font-medium'
+                          ? 'bg-violet-50 dark:bg-violet-950/30 text-violet-950 dark:text-violet-200 font-medium'
                           : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/70 text-zinc-700 dark:text-zinc-300'
                       }`}
                     >
                       <span className="w-2 h-2 rounded-full mt-1.5 bg-violet-500 shrink-0" />
                       <div>
                         <p className="font-semibold text-zinc-900 dark:text-white">
-                          TechHub NCR (Organizer)
+                          🏢 TechHub NCR (Organizer)
                         </p>
                         <p className="text-[11px] text-zinc-500">
-                          Publish events, view attendee analytics
+                          Publish events, view analytics
                         </p>
                       </div>
                     </button>
                   </div>
 
-                  <div className="pt-1 mt-1 border-t border-zinc-100 dark:border-zinc-800 px-3 py-1 flex items-center justify-between text-[11px] text-zinc-500">
-                    <Link
-                      href="/onboarding"
-                      onClick={() => setPersonaDropdownOpen(false)}
-                      className="text-rose-600 dark:text-rose-400 hover:underline"
+                  <div className="pt-1 mt-1 border-t border-zinc-100 dark:border-zinc-800 px-2">
+                    <button
+                      onClick={() => {
+                        logout();
+                        setPersonaDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 p-2 rounded-lg text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
                     >
-                      Edit Preferences
-                    </Link>
-                    <Link
-                      href="/profile"
-                      onClick={() => setPersonaDropdownOpen(false)}
-                      className="hover:underline"
-                    >
-                      View Profile
-                    </Link>
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out</span>
+                    </button>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Create Event CTA */}
-            <Link
-              href="/organizer/events/new"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 text-xs font-semibold shadow-sm transition-all hover:shadow"
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-rose-400 dark:text-rose-600" />
-              <span>Post Event</span>
-            </Link>
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
 
         </div>
       </div>
 
-      {/* Mobile bottom navigation bar */}
-      <div className="lg:hidden flex items-center justify-around border-t border-zinc-200 dark:border-zinc-800 py-2 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md">
-        {navLinks.map((link) => {
-          const Icon = link.icon;
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors ${
-                isActive
-                  ? 'text-rose-600 dark:text-rose-400 font-bold'
-                  : 'text-zinc-500 dark:text-zinc-400'
-              }`}
-            >
-              <div className="relative">
+      {/* Mobile navigation drawer */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-3 px-4 space-y-1 animate-in fade-in slide-in-from-top-2">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 font-semibold'
+                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                }`}
+              >
                 <Icon className="w-5 h-5" />
+                <span>{link.label}</span>
                 {link.badge !== undefined && link.badge > 0 && (
-                  <span className="absolute -top-1 -right-2 px-1 text-[9px] font-bold rounded-full bg-rose-500 text-white">
+                  <span className="ml-auto px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
                     {link.badge}
                   </span>
                 )}
-              </div>
-              <span>{link.label}</span>
-            </Link>
-          );
-        })}
-      </div>
+              </Link>
+            );
+          })}
+          <button
+            onClick={() => { logout(); setMobileMenuOpen(false); }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Log Out</span>
+          </button>
+        </div>
+      )}
     </header>
   );
 }

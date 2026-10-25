@@ -9,6 +9,9 @@ import { useToast } from './ToastContext';
 interface UserContextType {
   currentUser: UserProfile;
   isOrganizer: boolean;
+  isLoggedIn: boolean;
+  login: (role: 'attendee' | 'organizer') => void;
+  logout: () => void;
   switchIdentity: (role: 'attendee' | 'organizer' | 'custom', customUser?: UserProfile) => void;
   // Location
   selectedCity: string;
@@ -42,11 +45,13 @@ const STORAGE_KEYS = {
   CITY: 'nearvibe_selected_city',
   COORDS: 'nearvibe_user_coords',
   RADIUS: 'nearvibe_radius_km',
+  LOGGED_IN: 'nearvibe_logged_in',
 };
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const { addToast } = useToast();
   const [currentUser, setCurrentUser] = useState<UserProfile>(DEMO_ATTENDEE);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [selectedCity, setSelectedCityState] = useState<string>('Noida');
   const [userCoordinates, setUserCoordinates] = useState<{ latitude: number; longitude: number } | null>({
     latitude: 28.5355,
@@ -74,6 +79,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           setDbConnected(false);
           setIsDemoMode(true);
         });
+
+      // Login state restore
+      const wasLoggedIn = localStorage.getItem(STORAGE_KEYS.LOGGED_IN);
+      if (wasLoggedIn === 'true') {
+        setIsLoggedIn(true);
+      }
 
       // Role restore
       const savedRole = localStorage.getItem(STORAGE_KEYS.CURRENT_USER_ROLE);
@@ -105,6 +116,31 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       console.warn('LocalStorage initialization notice:', e);
     }
   }, []);
+
+  const login = useCallback(
+    (role: 'attendee' | 'organizer') => {
+      if (role === 'organizer') {
+        setCurrentUser(DEMO_ORGANIZER);
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER_ROLE, 'organizer');
+        addToast('Welcome back, TechHub NCR!', 'success', 'Logged In');
+      } else {
+        setCurrentUser(DEMO_ATTENDEE);
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER_ROLE, 'attendee');
+        addToast('Welcome back, Aarav!', 'success', 'Logged In');
+      }
+      setIsLoggedIn(true);
+      localStorage.setItem(STORAGE_KEYS.LOGGED_IN, 'true');
+    },
+    [addToast]
+  );
+
+  const logout = useCallback(() => {
+    setIsLoggedIn(false);
+    setCurrentUser(DEMO_ATTENDEE);
+    localStorage.removeItem(STORAGE_KEYS.LOGGED_IN);
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER_ROLE);
+    addToast('Logged out successfully', 'info', 'See you soon!');
+  }, [addToast]);
 
   const switchIdentity = useCallback(
     (role: 'attendee' | 'organizer' | 'custom', customUser?: UserProfile) => {
@@ -282,6 +318,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentUser,
         isOrganizer: currentUser.role === 'organizer',
+        isLoggedIn,
+        login,
+        logout,
         switchIdentity,
         selectedCity,
         userCoordinates,

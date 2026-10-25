@@ -142,7 +142,7 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Neon PostgreSQL Powered</span>
+              <span>Cloud PostgreSQL</span>
             </span>
             <span>•</span>
             <a
