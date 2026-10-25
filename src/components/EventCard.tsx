@@ -27,9 +27,10 @@ import confetti from 'canvas-confetti';
 interface EventCardProps {
   event: EventItem;
   priority?: boolean;
+  isSelected?: boolean;
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, isSelected }: EventCardProps) {
   const { isEventSaved, toggleSave, isEventRegistered, registerForEvent } = useUser();
   const [imgError, setImgError] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -80,7 +81,13 @@ export default function EventCard({ event }: EventCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/90 shadow-sm hover:shadow-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 overflow-hidden">
+    <div
+      className={`group relative flex flex-col rounded-2xl bg-white dark:bg-zinc-900 transition-all duration-300 overflow-hidden ${
+        isSelected
+          ? 'border-2 border-rose-500 dark:border-rose-500 shadow-xl shadow-rose-500/15 ring-2 ring-rose-500/30'
+          : 'border border-zinc-200/90 dark:border-zinc-800/90 shadow-sm hover:shadow-xl hover:border-zinc-300 dark:hover:border-zinc-700'
+      }`}
+    >
       
       {/* Cover Image Container */}
       <Link href={`/events/${event.id}`} className="relative aspect-[16/9] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">

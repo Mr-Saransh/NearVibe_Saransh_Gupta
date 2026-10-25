@@ -394,12 +394,14 @@ function DiscoverContent() {
                   {events.map((evt) => (
                     <div
                       key={evt.id}
+                      onClick={() => setSelectedMapEventId(evt.id)}
                       onMouseEnter={() => setSelectedMapEventId(evt.id)}
-                      className={`transition-all ${
-                        selectedMapEventId === evt.id ? 'ring-2 ring-rose-500 rounded-2xl' : ''
-                      }`}
+                      className="transition-transform duration-200"
                     >
-                      <EventCard event={evt} />
+                      <EventCard
+                        event={evt}
+                        isSelected={selectedMapEventId === evt.id}
+                      />
                     </div>
                   ))}
                 </div>
