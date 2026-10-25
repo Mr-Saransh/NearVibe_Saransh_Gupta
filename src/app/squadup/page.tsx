@@ -454,7 +454,7 @@ export default function SquadUpPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTeams.map((team) => {
             const match = profile ? calculateSquadMatchScore(team, profile) : null;
-            const isFull = team.currentMembers >= team.maxMembers;
+            const isFull = (team.currentMembers ?? team.currentMemberCount) >= team.maxMembers;
             const isUserLeader = team.leaderId === currentUser.id;
             const isUserMember = team.members?.some((m) => m.userId === currentUser.id);
 
@@ -527,7 +527,7 @@ export default function SquadUpPage() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-zinc-500">Roster Capacity</span>
                     <span className="font-bold text-zinc-900 dark:text-white">
-                      {team.currentMembers} / {team.maxMembers} Members
+                      {team.currentMembers ?? team.currentMemberCount} / {team.maxMembers} Members
                     </span>
                   </div>
                   <div className="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -536,7 +536,7 @@ export default function SquadUpPage() {
                         isFull ? 'bg-amber-500' : 'bg-emerald-500'
                       }`}
                       style={{
-                        width: `${Math.min(100, (team.currentMembers / team.maxMembers) * 100)}%`,
+                        width: `${Math.min(100, ((team.currentMembers ?? team.currentMemberCount) / team.maxMembers) * 100)}%`,
                       }}
                     />
                   </div>

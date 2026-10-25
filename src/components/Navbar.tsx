@@ -17,6 +17,7 @@ import {
   Users,
   Calendar,
   Upload,
+  Sparkles,
 } from 'lucide-react';
 import { useUser } from '@/lib/context/UserContext';
 import { NCR_CITIES } from '@/lib/utils/geo';

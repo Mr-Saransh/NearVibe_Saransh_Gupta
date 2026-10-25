@@ -38,6 +38,7 @@ const matchingNearbyEvent: EventItem = {
   capacity: 100,
   registeredCount: 85, // 85% filled -> high popularity
   status: 'published',
+  trustStatus: 'organizer_verified',
   createdAt: new Date().toISOString(),
 };
 
@@ -63,6 +64,7 @@ const nonMatchingFarEvent: EventItem = {
   capacity: 50,
   registeredCount: 5, // low fill
   status: 'published',
+  trustStatus: 'needs_review',
   createdAt: new Date().toISOString(),
 };
 
