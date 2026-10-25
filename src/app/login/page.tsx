@@ -11,20 +11,12 @@ const DEMO_ACCOUNTS = {
     password: 'candidate123',
     name: 'Aarav Sharma',
     role: 'attendee' as const,
-    description: 'Student builder passionate about AI, Hackathons & Tech meetups',
-    icon: GraduationCap,
-    color: 'rose',
-    features: ['Discover local events', 'SquadUp teammate matching', 'Smart weekend planner', 'RSVP & bookmarks'],
   },
   organizer: {
     email: 'techhub@nearvibe.in',
     password: 'organizer123',
     name: 'TechHub NCR',
     role: 'organizer' as const,
-    description: 'Community organizer hosting hackathons & workshops across Delhi NCR',
-    icon: Building2,
-    color: 'violet',
-    features: ['Poster-to-Event OCR capture', 'Publish & manage events', 'Review squad applicants', 'Attendee analytics'],
   },
 };
 
@@ -53,7 +45,7 @@ export default function LoginPage() {
       login(account.role);
       router.push('/');
     } else {
-      setError('Invalid email or password. Check the demo credentials below.');
+      setError('Invalid email or password. You can use the quick demo access buttons below.');
     }
   };
 
@@ -62,8 +54,6 @@ export default function LoginPage() {
     login(account.role);
     router.push('/');
   };
-
-  const activeAccount = DEMO_ACCOUNTS[selectedTab];
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950">
@@ -75,10 +65,10 @@ export default function LoginPage() {
       </div>
 
       <div className="relative flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-6">
           
           {/* Logo */}
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-3 group">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-500 via-rose-600 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/25">
                 <Radio className="w-7 h-7" />
@@ -93,7 +83,7 @@ export default function LoginPage() {
               </div>
             </div>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-xs mx-auto">
-              Sign in to discover, attend, and organize local events near you.
+              Sign in to discover, attend, and organize local events.
             </p>
           </div>
 
@@ -104,7 +94,7 @@ export default function LoginPage() {
             <div className="flex border-b border-zinc-200 dark:border-zinc-800">
               <button
                 onClick={() => { setSelectedTab('candidate'); setError(''); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition-all ${
                   selectedTab === 'candidate'
                     ? 'text-rose-600 dark:text-rose-400 border-b-2 border-rose-500 bg-rose-50/50 dark:bg-rose-950/20'
                     : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
@@ -115,7 +105,7 @@ export default function LoginPage() {
               </button>
               <button
                 onClick={() => { setSelectedTab('organizer'); setError(''); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition-all ${
                   selectedTab === 'organizer'
                     ? 'text-violet-600 dark:text-violet-400 border-b-2 border-violet-500 bg-violet-50/50 dark:bg-violet-950/20'
                     : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
@@ -128,43 +118,15 @@ export default function LoginPage() {
 
             <div className="p-6 space-y-5">
               
-              {/* Account Info */}
-              <div className={`p-4 rounded-2xl border ${
-                selectedTab === 'candidate'
-                  ? 'bg-rose-50/60 dark:bg-rose-950/15 border-rose-100 dark:border-rose-900/40'
-                  : 'bg-violet-50/60 dark:bg-violet-950/15 border-violet-100 dark:border-violet-900/40'
-              }`}>
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    selectedTab === 'candidate'
-                      ? 'bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400'
-                      : 'bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400'
-                  }`}>
-                    {React.createElement(activeAccount.icon, { className: 'w-5 h-5' })}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-zinc-900 dark:text-white">{activeAccount.name}</p>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">{activeAccount.description}</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {activeAccount.features.map((f) => (
-                        <span key={f} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700">
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Login Form */}
+              {/* Standard Clean Login Form */}
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email</label>
+                  <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Email Address</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={activeAccount.email}
+                    placeholder="Enter your email"
                     required
                     className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all"
                   />
@@ -176,7 +138,7 @@ export default function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder={activeAccount.password}
+                      placeholder="Enter your password"
                       required
                       className="w-full px-4 py-3 pr-12 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition-all"
                     />
@@ -210,55 +172,57 @@ export default function LoginPage() {
               </form>
 
               {/* Divider */}
-              <div className="relative">
+              <div className="relative pt-2">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-white dark:bg-zinc-900 px-3 text-zinc-400 font-medium">or use quick demo login</span>
+                  <span className="bg-white dark:bg-zinc-900 px-3 text-zinc-400 font-medium">demo evaluation accounts</span>
                 </div>
               </div>
 
-              {/* Quick Demo Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => handleQuickLogin('candidate')}
-                  className="flex flex-col items-center gap-1.5 p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-rose-700 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all group"
-                >
-                  <GraduationCap className="w-5 h-5 text-rose-500" />
-                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">
-                    Quick Candidate
-                  </span>
-                  <span className="text-[10px] text-zinc-400">1-click demo</span>
-                </button>
-                <button
-                  onClick={() => handleQuickLogin('organizer')}
-                  className="flex flex-col items-center gap-1.5 p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-violet-700 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-violet-50 dark:hover:bg-violet-950/20 transition-all group"
-                >
-                  <Building2 className="w-5 h-5 text-violet-500" />
-                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-violet-600 dark:group-hover:text-violet-400">
-                    Quick Organizer
-                  </span>
-                  <span className="text-[10px] text-zinc-400">1-click demo</span>
-                </button>
-              </div>
-
-              {/* Demo Credentials */}
-              <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60 space-y-2">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                  <Shield className="w-3 h-3" />
-                  <span>Demo Credentials</span>
+              {/* Quick Demo Buttons at the END */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => handleQuickLogin('candidate')}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-rose-700 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all group"
+                  >
+                    <GraduationCap className="w-5 h-5 text-rose-500" />
+                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">
+                      Candidate Demo
+                    </span>
+                    <span className="text-[10px] text-zinc-400">Aarav &bull; 1-click</span>
+                  </button>
+                  <button
+                    onClick={() => handleQuickLogin('organizer')}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-violet-700 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-violet-50 dark:hover:bg-violet-950/20 transition-all group"
+                  >
+                    <Building2 className="w-5 h-5 text-violet-500" />
+                    <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                      Organizer Demo
+                    </span>
+                    <span className="text-[10px] text-zinc-400">TechHub &bull; 1-click</span>
+                  </button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 text-[11px]">
-                  <div>
-                    <p className="font-bold text-zinc-700 dark:text-zinc-300">Candidate</p>
-                    <p className="text-zinc-500">{DEMO_ACCOUNTS.candidate.email}</p>
-                    <p className="text-zinc-500 font-mono">{DEMO_ACCOUNTS.candidate.password}</p>
+
+                {/* Demo Credentials Info */}
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <Shield className="w-3 h-3 text-emerald-500" />
+                    <span>Credentials Reference</span>
                   </div>
-                  <div>
-                    <p className="font-bold text-zinc-700 dark:text-zinc-300">Organizer</p>
-                    <p className="text-zinc-500">{DEMO_ACCOUNTS.organizer.email}</p>
-                    <p className="text-zinc-500 font-mono">{DEMO_ACCOUNTS.organizer.password}</p>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div>
+                      <p className="font-semibold text-zinc-700 dark:text-zinc-300">Candidate</p>
+                      <p className="text-zinc-500 truncate">{DEMO_ACCOUNTS.candidate.email}</p>
+                      <p className="text-zinc-500 font-mono text-[10px]">{DEMO_ACCOUNTS.candidate.password}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-zinc-700 dark:text-zinc-300">Organizer</p>
+                      <p className="text-zinc-500 truncate">{DEMO_ACCOUNTS.organizer.email}</p>
+                      <p className="text-zinc-500 font-mono text-[10px]">{DEMO_ACCOUNTS.organizer.password}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -268,7 +232,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="text-center text-[11px] text-zinc-400 dark:text-zinc-500">
-            Built for Hackathon &mdash; Hyperlocal Event Discovery &amp; Community Engagement
+            NearVibe &bull; Hyperlocal Event Discovery &amp; Community Engagement
           </p>
         </div>
       </div>

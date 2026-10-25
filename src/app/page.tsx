@@ -163,129 +163,21 @@ export default function HomePage() {
               No more fragmented WhatsApp groups or Instagram stories. NearVibe centralizes local hackathons, workshops, and meetups with AI teammate matching and verified schedules.
             </p>
 
-            {/* Quick Demo Login Cards */}
-            <div className="pt-8 max-w-3xl mx-auto">
-              <div className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-4">
-                Choose a demo persona to explore the app
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                {/* Candidate Demo Card */}
-                <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-rose-300 dark:hover:border-rose-800 transition-all flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-                        <GraduationCap className="w-5 h-5" />
-                      </div>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
-                        Candidate
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-zinc-900 dark:text-white text-base">
-                        Aarav Sharma
-                      </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Student builder & hackathon enthusiast
-                      </p>
-                    </div>
-
-                    <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-                      <li className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>Curated AI recommendations by tech interests</span>
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>SquadUp hackathon teammate matching</span>
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>Weekend planner & RSVP management</span>
-                      </li>
-                    </ul>
-
-                    <div className="pt-2 text-[11px] text-zinc-400 font-mono">
-                      Pass: <span className="text-zinc-700 dark:text-zinc-300">candidate123</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-5 flex items-center gap-2">
-                    <button
-                      onClick={() => login('attendee')}
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-xs shadow-md shadow-rose-500/20 text-center transition-all hover:scale-[1.02]"
-                    >
-                      Login as Candidate
-                    </button>
-                    <Link
-                      href="/login"
-                      className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-                      title="Use credentials"
-                    >
-                      <Lock className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Organizer Demo Card */}
-                <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-violet-300 dark:hover:border-violet-800 transition-all flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-                        <Building2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300">
-                        Organizer
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-zinc-900 dark:text-white text-base">
-                        TechHub NCR
-                      </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Community host & hackathon director
-                      </p>
-                    </div>
-
-                    <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-                      <li className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>Poster-to-Event OCR auto extraction</span>
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>Organizer dashboard & attendee analytics</span>
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        <span>Review & approve squad applications</span>
-                      </li>
-                    </ul>
-
-                    <div className="pt-2 text-[11px] text-zinc-400 font-mono">
-                      Pass: <span className="text-zinc-700 dark:text-zinc-300">organizer123</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-5 flex items-center gap-2">
-                    <button
-                      onClick={() => login('organizer')}
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-600 text-white font-semibold text-xs shadow-md shadow-violet-500/20 text-center transition-all hover:scale-[1.02]"
-                    >
-                      Login as Organizer
-                    </button>
-                    <Link
-                      href="/login"
-                      className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-                      title="Use credentials"
-                    >
-                      <Lock className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
+            {/* Hero CTAs */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+              <Link
+                href="/discover"
+                className="w-full sm:w-auto flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-xs sm:text-sm shadow-md shadow-rose-500/20 text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+              >
+                <span>Explore Events</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/login"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold text-xs sm:text-sm shadow-sm text-center transition-all"
+              >
+                Sign In
+              </Link>
             </div>
           </div>
         </section>
@@ -378,6 +270,139 @@ export default function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Evaluation / Quick Demo Section at the END of the landing page */}
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full border-t border-zinc-200 dark:border-zinc-800">
+          <div className="text-center max-w-xl mx-auto mb-8 space-y-2">
+            <span className="text-[11px] font-bold tracking-wider uppercase text-rose-600 dark:text-rose-400">
+              Judges & Evaluators
+            </span>
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">
+              Test NearVibe in 1-Click
+            </h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Choose either persona to instantly explore personalized candidate recommendations or full organizer tools.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-left">
+            {/* Candidate Demo Card */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-rose-300 dark:hover:border-rose-800 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
+                    Candidate Demo
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-zinc-900 dark:text-white text-base">
+                    Aarav Sharma
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Student builder & hackathon enthusiast
+                  </p>
+                </div>
+
+                <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Curated AI recommendations by tech stack</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>SquadUp teammate matching & join requests</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Smart weekend planner & RSVP sync</span>
+                  </li>
+                </ul>
+
+                <div className="pt-2 text-[11px] text-zinc-400 font-mono">
+                  Pass: <span className="text-zinc-700 dark:text-zinc-300">candidate123</span>
+                </div>
+              </div>
+
+              <div className="pt-5 flex items-center gap-2">
+                <button
+                  onClick={() => login('attendee')}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-xs shadow-md shadow-rose-500/20 text-center transition-all hover:scale-[1.02]"
+                >
+                  Explore as Candidate
+                </button>
+                <Link
+                  href="/login"
+                  className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                  title="Manual login"
+                >
+                  <Lock className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Organizer Demo Card */}
+            <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-violet-300 dark:hover:border-violet-800 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300">
+                    Organizer Demo
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-zinc-900 dark:text-white text-base">
+                    TechHub NCR
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Community host & hackathon director
+                  </p>
+                </div>
+
+                <ul className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Poster-to-Event OCR auto extraction</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Organizer dashboard & attendee analytics</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>Review & approve squad applications</span>
+                  </li>
+                </ul>
+
+                <div className="pt-2 text-[11px] text-zinc-400 font-mono">
+                  Pass: <span className="text-zinc-700 dark:text-zinc-300">organizer123</span>
+                </div>
+              </div>
+
+              <div className="pt-5 flex items-center gap-2">
+                <button
+                  onClick={() => login('organizer')}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-600 text-white font-semibold text-xs shadow-md shadow-violet-500/20 text-center transition-all hover:scale-[1.02]"
+                >
+                  Manage as Organizer
+                </button>
+                <Link
+                  href="/login"
+                  className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                  title="Manual login"
+                >
+                  <Lock className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
