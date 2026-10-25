@@ -5,6 +5,9 @@ import {
   EventComment,
   EventReport,
   UserProfile,
+  SquadTeam,
+  SquadProfile,
+  SquadJoinRequest,
 } from '@/types';
 
 export interface OrganizerStats {
@@ -33,4 +36,31 @@ export interface IEventRepository {
   getOrganizerStats(organizerId: string): Promise<OrganizerStats>;
   getUserProfile(userId: string): Promise<UserProfile | null>;
   updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile>;
+  // SquadUp Team formation
+  getSquadTeams(eventId?: string, userId?: string): Promise<SquadTeam[]>;
+  createSquadTeam(data: {
+    eventId: string;
+    leaderId: string;
+    leaderName: string;
+    leaderAvatar?: string;
+    teamName: string;
+    description: string;
+    requiredRoles: string[];
+    maxMembers: number;
+    leaderRole?: string;
+  }): Promise<SquadTeam>;
+  requestJoinSquadTeam(data: {
+    teamId: string;
+    eventId: string;
+    applicantId: string;
+    applicantName: string;
+    applicantAvatar?: string;
+    appliedRole: string;
+    note?: string;
+    skills?: string[];
+  }): Promise<SquadJoinRequest>;
+  handleSquadJoinRequest(requestId: string, status: 'accepted' | 'rejected', leaderId: string): Promise<boolean>;
+  leaveSquadTeam(teamId: string, userId: string): Promise<boolean>;
+  getSquadProfile(userId: string): Promise<SquadProfile | null>;
+  updateSquadProfile(userId: string, data: Partial<SquadProfile>): Promise<SquadProfile>;
 }

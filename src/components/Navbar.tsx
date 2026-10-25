@@ -14,7 +14,9 @@ import {
   Navigation,
   Database,
   Layers,
-  Sparkles,
+  Users,
+  Calendar,
+  Upload,
 } from 'lucide-react';
 import { useUser } from '@/lib/context/UserContext';
 import { NCR_CITIES } from '@/lib/utils/geo';
@@ -40,9 +42,12 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/', label: 'Explore', icon: Sparkles },
-    { href: '/discover', label: 'Discover & Map', icon: Compass },
+    { href: '/discover', label: 'Discover', icon: Compass },
+    { href: '/capture', label: 'Capture', icon: Upload },
+    { href: '/squadup', label: 'SquadUp', icon: Users },
+    { href: '/planner', label: 'Planner', icon: Calendar },
     { href: '/saved', label: 'Saved', icon: Bookmark, badge: savedEventIds.length },
-    { href: '/organizer', label: 'Organizer Hub', icon: Layers },
+    { href: '/organizer', label: 'Organizer', icon: Layers },
   ];
 
   return (

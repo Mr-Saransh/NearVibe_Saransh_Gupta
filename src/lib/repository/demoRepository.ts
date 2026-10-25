@@ -5,6 +5,9 @@ import {
   EventComment,
   EventReport,
   UserProfile,
+  SquadTeam,
+  SquadProfile,
+  SquadJoinRequest,
 } from '@/types';
 import { IEventRepository, OrganizerStats } from './types';
 import {
@@ -12,7 +15,9 @@ import {
   DEMO_ORGANIZER,
   getInitialEvents,
   INITIAL_COMMENTS,
+  INITIAL_SQUAD_TEAMS,
 } from '../data/seedData';
+import { scoreTeamForMember } from '../utils/squadMatcher';
 
 const STORAGE_KEYS = {
   EVENTS: 'nearvibe_demo_events',
@@ -21,6 +26,9 @@ const STORAGE_KEYS = {
   COMMENTS: 'nearvibe_demo_comments',
   REPORTS: 'nearvibe_demo_reports',
   PROFILE: 'nearvibe_demo_profile',
+  SQUAD_TEAMS: 'nearvibe_demo_squad_teams',
+  SQUAD_REQUESTS: 'nearvibe_demo_squad_requests',
+  SQUAD_PROFILES: 'nearvibe_demo_squad_profiles',
 };
 
 // In-memory fallback for server-side execution
@@ -38,6 +46,11 @@ let memorySaved: string[] = ['evt-002'];
 let memoryComments: EventComment[] = [...INITIAL_COMMENTS];
 let memoryReports: EventReport[] = [];
 let memoryProfile: UserProfile = { ...DEMO_ATTENDEE };
+let memoryTeams: SquadTeam[] = [...INITIAL_SQUAD_TEAMS];
+let memoryRequests: SquadJoinRequest[] = [];
+let memorySquadProfiles: Record<string, SquadProfile> = {
+  [DEMO_ATTENDEE.id]: DEMO_ATTENDEE.squadProfile!,
+};
 
 function isClient(): boolean {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
@@ -128,6 +141,39 @@ export class DemoRepository implements IEventRepository {
     }
   }
 
+  private getTeamsData(): SquadTeam[] {
+    if (isClient()) {
+      const stored = getStored<SquadTeam[]>(STORAGE_KEYS.SQUAD_TEAMS, []);
+      if (stored.length > 0) return stored;
+      setStored(STORAGE_KEYS.SQUAD_TEAMS, INITIAL_SQUAD_TEAMS);
+      return INITIAL_SQUAD_TEAMS;
+    }
+    return memoryTeams;
+  }
+
+  private saveTeamsData(teams: SquadTeam[]): void {
+    if (isClient()) {
+      setStored(STORAGE_KEYS.SQUAD_TEAMS, teams);
+    } else {
+      memoryTeams = teams;
+    }
+  }
+
+  private getRequestsData(): SquadJoinRequest[] {
+    if (isClient()) {
+      return getStored<SquadJoinRequest[]>(STORAGE_KEYS.SQUAD_REQUESTS, []);
+    }
+    return memoryRequests;
+  }
+
+  private saveRequestsData(requests: SquadJoinRequest[]): void {
+    if (isClient()) {
+      setStored(STORAGE_KEYS.SQUAD_REQUESTS, requests);
+    } else {
+      memoryRequests = requests;
+    }
+  }
+
   async getEvents(params: EventFilterParams = {}, userId?: string): Promise<EventItem[]> {
     const all = this.getEventsData();
     const registrations = this.getRegistrationsData();
@@ -174,7 +220,10 @@ export class DemoRepository implements IEventRepository {
       filtered = filtered.filter((e) => e.featured);
     }
 
-    // Decorate with user state
+    if (params.trustStatus) {
+      filtered = filtered.filter((e) => e.trustStatus === params.trustStatus);
+    }
+
     return filtered.map((e) => {
       const isReg = userId
         ? registrations.some(
@@ -227,6 +276,7 @@ export class DemoRepository implements IEventRepository {
         'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
       startTime: data.startTime || new Date(Date.now() + 86400000 * 3).toISOString(),
       endTime: data.endTime || new Date(Date.now() + 86400000 * 3 + 3600000 * 4).toISOString(),
+      registrationDeadline: data.registrationDeadline,
       format: data.format || 'in-person',
       venueName: data.venueName || 'Auditorium & Coworking',
       address: data.address || 'Delhi NCR',
@@ -239,6 +289,12 @@ export class DemoRepository implements IEventRepository {
       registeredCount: 0,
       status: data.status || 'published',
       featured: data.featured || false,
+      trustStatus: data.trustStatus || (data.sourceType === 'poster_upload' || data.sourceType === 'url_import' ? 'source_attached' : 'details_reviewed'),
+      sourceType: data.sourceType || 'direct_published',
+      sourceUrl: data.sourceUrl,
+      extractionMetadata: data.extractionMetadata,
+      duplicateOfId: data.duplicateOfId,
+      duplicateReason: data.duplicateReason,
       createdAt: new Date().toISOString(),
     };
 
@@ -307,8 +363,13 @@ export class DemoRepository implements IEventRepository {
       return { success: false, error: 'Event is not accepting registrations' };
     }
 
-    if (event.registeredCount >= event.capacity) {
+    if (event.capacity > 0 && event.registeredCount >= event.capacity) {
       return { success: false, error: 'This event has reached full capacity' };
+    }
+
+    // Registration deadline check
+    if (event.registrationDeadline && new Date(event.registrationDeadline).getTime() < Date.now()) {
+      return { success: false, error: 'Registration deadline has passed' };
     }
 
     const regs = this.getRegistrationsData();
@@ -331,7 +392,6 @@ export class DemoRepository implements IEventRepository {
       });
     }
 
-    // Increment count
     event.registeredCount += 1;
     this.saveEventsData(events);
     this.saveRegistrationsData(regs);
@@ -510,5 +570,232 @@ export class DemoRepository implements IEventRepository {
     }
     memoryProfile = { ...memoryProfile, ...updates };
     return memoryProfile;
+  }
+
+  // -------------------------------------------------------------
+  // SQUADUP: Teams, Requests, and Profiles Implementation
+  // -------------------------------------------------------------
+  async getSquadTeams(eventId?: string, userId?: string): Promise<SquadTeam[]> {
+    let teams = this.getTeamsData();
+    if (eventId) {
+      teams = teams.filter((t) => t.eventId === eventId);
+    }
+
+    // Attach matching score if profile exists
+    let profile: SquadProfile | null = null;
+    if (userId) {
+      profile = await this.getSquadProfile(userId);
+    }
+
+    return teams.map((team) => {
+      const match = scoreTeamForMember(team, profile);
+      return {
+        ...team,
+        matchScore: match.score,
+        matchReason: match.reason,
+      };
+    });
+  }
+
+  async createSquadTeam(data: {
+    eventId: string;
+    leaderId: string;
+    leaderName: string;
+    leaderAvatar?: string;
+    teamName: string;
+    description: string;
+    requiredRoles: string[];
+    maxMembers: number;
+    leaderRole?: string;
+  }): Promise<SquadTeam> {
+    const teams = this.getTeamsData();
+    const event = (await this.getEventById(data.eventId)) || undefined;
+
+    const newTeam: SquadTeam = {
+      id: `team-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+      eventId: data.eventId,
+      eventTitle: event?.title || 'Hackathon / Event',
+      leaderId: data.leaderId,
+      leaderName: data.leaderName,
+      leaderAvatar: data.leaderAvatar,
+      teamName: data.teamName.trim(),
+      name: data.teamName.trim(),
+      description: data.description.trim(),
+      requiredRoles: data.requiredRoles,
+      maxMembers: data.maxMembers || 4,
+      currentMemberCount: 1,
+      currentMembers: 1,
+      status: 'recruiting',
+      createdAt: new Date().toISOString(),
+      members: [
+        {
+          userId: data.leaderId,
+          name: data.leaderName,
+          avatarUrl: data.leaderAvatar,
+          role: data.leaderRole || 'Team Leader',
+          joinedAt: new Date().toISOString(),
+          isLeader: true,
+        },
+      ],
+    };
+
+    teams.unshift(newTeam);
+    this.saveTeamsData(teams);
+    return newTeam;
+  }
+
+  async requestJoinSquadTeam(data: {
+    teamId: string;
+    eventId: string;
+    applicantId: string;
+    applicantName: string;
+    applicantAvatar?: string;
+    appliedRole: string;
+    note?: string;
+    skills?: string[];
+  }): Promise<SquadJoinRequest> {
+    const teams = this.getTeamsData();
+    const team = teams.find((t) => t.id === data.teamId);
+    if (!team) throw new Error('Team not found');
+
+    const memberCount = team.currentMemberCount ?? 1;
+    if (memberCount >= team.maxMembers || team.status === 'full') {
+      throw new Error('This team is already at full capacity');
+    }
+
+    if ((team.members || []).some((m) => m.userId === data.applicantId)) {
+      throw new Error('You are already an active member of this team');
+    }
+
+    const requests = this.getRequestsData();
+    const existing = requests.find(
+      (r) => r.teamId === data.teamId && r.applicantId === data.applicantId && r.status === 'pending'
+    );
+    if (existing) {
+      throw new Error('You already have a pending join request for this team');
+    }
+
+    const newRequest: SquadJoinRequest = {
+      id: `req-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+      teamId: data.teamId,
+      eventId: data.eventId,
+      applicantId: data.applicantId,
+      applicantName: data.applicantName,
+      applicantAvatar: data.applicantAvatar,
+      appliedRole: data.appliedRole,
+      note: data.note,
+      skills: data.skills || [],
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    requests.unshift(newRequest);
+    this.saveRequestsData(requests);
+    return newRequest;
+  }
+
+  async handleSquadJoinRequest(
+    requestId: string,
+    status: 'accepted' | 'rejected',
+    leaderId: string
+  ): Promise<boolean> {
+    const requests = this.getRequestsData();
+    const req = requests.find((r) => r.id === requestId);
+    if (!req) throw new Error('Join request not found');
+
+    const teams = this.getTeamsData();
+    const team = teams.find((t) => t.id === req.teamId);
+    if (!team) throw new Error('Team not found');
+
+    if (team.leaderId !== leaderId && leaderId !== 'admin') {
+      throw new Error('Unauthorized: Only the team leader can accept or reject requests');
+    }
+
+    req.status = status;
+    this.saveRequestsData(requests);
+
+    if (status === 'accepted') {
+      const currentCount = team.currentMemberCount ?? 1;
+      if (currentCount >= team.maxMembers) {
+        throw new Error('Team is already full');
+      }
+
+      team.members = team.members || [];
+      team.members.push({
+        userId: req.applicantId || req.userId || 'u-unknown',
+        name: req.applicantName || req.userName || 'Member',
+        avatarUrl: req.applicantAvatar || req.userAvatar,
+        role: req.appliedRole || req.role || 'Member',
+        joinedAt: new Date().toISOString(),
+        isLeader: false,
+      });
+      team.currentMemberCount = currentCount + 1;
+      team.currentMembers = team.currentMemberCount;
+      if (team.currentMemberCount >= team.maxMembers) {
+        team.status = 'full';
+      }
+      this.saveTeamsData(teams);
+    }
+
+    return true;
+  }
+
+  async leaveSquadTeam(teamId: string, userId: string): Promise<boolean> {
+    const teams = this.getTeamsData();
+    const team = teams.find((t) => t.id === teamId);
+    if (!team) return false;
+
+    team.members = (team.members || []).filter((m) => m.userId !== userId);
+    team.currentMemberCount = team.members.length;
+    team.currentMembers = team.members.length;
+    if (team.status === 'full' && team.currentMemberCount < team.maxMembers) {
+      team.status = 'recruiting';
+    }
+    this.saveTeamsData(teams);
+    return true;
+  }
+
+  async getSquadProfile(userId: string): Promise<SquadProfile | null> {
+    if (isClient()) {
+      const stored = getStored<Record<string, SquadProfile>>(
+        STORAGE_KEYS.SQUAD_PROFILES,
+        memorySquadProfiles
+      );
+      return stored[userId] || (userId === DEMO_ATTENDEE.id ? DEMO_ATTENDEE.squadProfile! : null);
+    }
+    return memorySquadProfiles[userId] || (userId === DEMO_ATTENDEE.id ? DEMO_ATTENDEE.squadProfile! : null);
+  }
+
+  async updateSquadProfile(userId: string, data: Partial<SquadProfile>): Promise<SquadProfile> {
+    const current = (await this.getSquadProfile(userId)) || {
+      userId,
+      name: 'Builder',
+      skills: ['TypeScript', 'React'],
+      preferredRoles: ['Frontend Developer'],
+      experience: 'Intermediate' as const,
+      collaborationStyle: 'In-Person' as const,
+      contactVisible: true,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const updated: SquadProfile = {
+      ...current,
+      ...data,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (isClient()) {
+      const stored = getStored<Record<string, SquadProfile>>(
+        STORAGE_KEYS.SQUAD_PROFILES,
+        memorySquadProfiles
+      );
+      stored[userId] = updated;
+      setStored(STORAGE_KEYS.SQUAD_PROFILES, stored);
+    } else {
+      memorySquadProfiles[userId] = updated;
+    }
+
+    return updated;
   }
 }

@@ -177,6 +177,13 @@ export async function POST(request: NextRequest) {
       capacity: body.capacity ? parseInt(body.capacity, 10) : 100,
       status: body.status || 'published',
       featured: Boolean(body.featured),
+      trustStatus: body.trustStatus || (body.sourceUrl ? 'source_attached' : 'needs_review'),
+      sourceType: body.sourceType || 'manual',
+      sourceUrl: body.sourceUrl,
+      registrationDeadline: body.registrationDeadline,
+      extractionMetadata: body.extractionMetadata,
+      duplicateOfId: body.duplicateOfId,
+      duplicateReason: body.duplicateReason,
     });
 
     return NextResponse.json({ success: true, event: created }, { status: 201 });

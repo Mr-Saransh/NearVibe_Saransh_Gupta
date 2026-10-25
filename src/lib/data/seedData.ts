@@ -1,4 +1,11 @@
-import { EventItem, UserProfile, EventComment } from '@/types';
+import {
+  EventItem,
+  UserProfile,
+  EventComment,
+  SquadProfile,
+  SquadTeam,
+  SquadJoinRequest,
+} from '@/types';
 
 // Helper to generate future dates relative to execution moment
 function getFutureDate(daysFromNow: number, hour: number = 10, minute: number = 0): string {
@@ -15,11 +22,26 @@ export const DEMO_ATTENDEE: UserProfile = {
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
   role: 'attendee',
   interests: ['Hackathons', 'Technology', 'AI & ML', 'Startups & Business'],
-  preferredCity: 'Noida, Delhi NCR',
+  preferredCity: 'Noida',
   preferredRadiusKm: 30,
   latitude: 28.5355,
   longitude: 77.3910, // Noida Sec 62
   createdAt: '2026-01-15T09:00:00Z',
+  squadProfile: {
+    userId: 'user_attendee_aarav',
+    name: 'Aarav Sharma',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    bio: 'Full-stack builder passionate about Next.js 16, TypeScript, and autonomous LLM agents.',
+    skills: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'Python', 'Node.js'],
+    preferredRoles: ['Frontend Developer', 'Full Stack Developer'],
+    experience: 'Intermediate',
+    collaborationStyle: 'In-Person',
+    contactVisible: true,
+    handle: '@aarav_codes',
+    githubUrl: 'https://github.com/aarav-sharma-dev',
+    portfolioUrl: 'https://aarav.dev',
+    updatedAt: new Date().toISOString(),
+  },
 };
 
 export const DEMO_ORGANIZER: UserProfile = {
@@ -43,13 +65,14 @@ export function getInitialEvents(): EventItem[] {
       organizerId: DEMO_ORGANIZER.id,
       organizerName: DEMO_ORGANIZER.name,
       organizerAvatar: DEMO_ORGANIZER.avatarUrl,
-      title: 'HackNCR 2026: 36-Hour National collegiate Hackathon',
+      title: 'HackNCR 2026: 36-Hour National Collegiate Hackathon',
       description: 'The premier collegiate builder hackathon in North India. Build AI-driven agents, decentralized apps, and smart city infrastructure. Features ₹3,50,000 prize pool, 1:1 mentorship from top founders, free food, and exclusive swag kits.',
       category: 'Hackathons',
       tags: ['Hackathon', 'AI', 'FullStack', 'Students', 'Prizes'],
       coverImage: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
       startTime: getFutureDate(3, 9, 0),
       endTime: getFutureDate(4, 21, 0),
+      registrationDeadline: getFutureDate(2, 23, 59), // Deadline in 2 days
       format: 'in-person',
       venueName: 'Amity Innovation Hub & Auditorium',
       address: 'Amity University Campus, Sector 125',
@@ -62,6 +85,9 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 294,
       status: 'published',
       featured: true,
+      trustStatus: 'organizer_verified',
+      sourceType: 'direct_published',
+      sourceUrl: 'https://hackncr2026.dev',
       createdAt: new Date().toISOString(),
     },
     {
@@ -76,6 +102,7 @@ export function getInitialEvents(): EventItem[] {
       coverImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
       startTime: getFutureDate(5, 14, 0),
       endTime: getFutureDate(5, 18, 0),
+      registrationDeadline: getFutureDate(4, 18, 0),
       format: 'in-person',
       venueName: 'DLF CyberCity Hub, CoWrks Tower B',
       address: 'Building 10, DLF Cyber City, Phase II',
@@ -88,6 +115,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 68,
       status: 'published',
       featured: true,
+      trustStatus: 'organizer_verified',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     },
     {
@@ -114,6 +143,9 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 52,
       status: 'published',
       featured: false,
+      trustStatus: 'source_attached',
+      sourceType: 'poster_upload',
+      sourceUrl: 'https://figma-delhi.org/meetup-oct',
       createdAt: new Date().toISOString(),
     },
     {
@@ -140,6 +172,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 114,
       status: 'published',
       featured: true,
+      trustStatus: 'organizer_verified',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     },
     {
@@ -166,6 +200,9 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 142,
       status: 'published',
       featured: false,
+      trustStatus: 'details_reviewed',
+      sourceType: 'url_import',
+      sourceUrl: 'https://iiitd.ac.in/events/oss-sprint',
       createdAt: new Date().toISOString(),
     },
     {
@@ -192,6 +229,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 31,
       status: 'published',
       featured: false,
+      trustStatus: 'source_attached',
+      sourceType: 'pasted_text',
       createdAt: new Date().toISOString(),
     },
     {
@@ -218,6 +257,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 78,
       status: 'published',
       featured: true,
+      trustStatus: 'organizer_verified',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     },
     {
@@ -244,6 +285,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 60,
       status: 'published',
       featured: false,
+      trustStatus: 'source_attached',
+      sourceType: 'poster_upload',
       createdAt: new Date().toISOString(),
     },
     {
@@ -270,6 +313,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 190,
       status: 'published',
       featured: false,
+      trustStatus: 'details_reviewed',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     },
     {
@@ -296,6 +341,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 48,
       status: 'published',
       featured: false,
+      trustStatus: 'organizer_verified',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     },
     {
@@ -322,6 +369,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 88,
       status: 'published',
       featured: false,
+      trustStatus: 'needs_review',
+      sourceType: 'pasted_text',
       createdAt: new Date().toISOString(),
     },
     {
@@ -346,6 +395,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 380,
       status: 'published',
       featured: false,
+      trustStatus: 'details_reviewed',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     },
     {
@@ -372,6 +423,8 @@ export function getInitialEvents(): EventItem[] {
       registeredCount: 112,
       status: 'published',
       featured: true,
+      trustStatus: 'organizer_verified',
+      sourceType: 'direct_published',
       createdAt: new Date().toISOString(),
     }
   ];
@@ -393,16 +446,102 @@ export const INITIAL_COMMENTS: EventComment[] = [
     userId: DEMO_ORGANIZER.id,
     authorName: 'TechHub NCR (Organizer)',
     authorAvatar: DEMO_ORGANIZER.avatarUrl,
-    commentText: 'Great question Aarav! We have a dedicated team-matching channel on Discord and a 45-minute mixer session at 10 AM on Day 1.',
+    commentText: 'Great question Aarav! Check out the SquadUp tab on this event to find open teams or invite fellow builders.',
     createdAt: new Date(Date.now() - 3600000 * 8).toISOString(),
   },
+];
+
+// Initial SquadUp Teams
+export const INITIAL_SQUAD_TEAMS: SquadTeam[] = [
   {
-    id: 'cmt-3',
-    eventId: 'evt-002',
-    userId: 'user_attendee_aarav',
-    authorName: 'Aarav Sharma',
-    authorAvatar: DEMO_ATTENDEE.avatarUrl,
-    commentText: 'Will cloud API credits (OpenAI/Anthropic) be provided during the hands-on coding segments?',
-    createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
-  }
+    id: 'team-001',
+    eventId: 'evt-001',
+    eventTitle: 'HackNCR 2026: 36-Hour National Collegiate Hackathon',
+    leaderId: 'user_rohan_ai',
+    leaderName: 'Rohan Gupta',
+    leaderAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+    teamName: 'NeuralWeavers',
+    description: 'Building an autonomous multi-agent disaster triage and emergency hospital routing network for Delhi NCR.',
+    requiredRoles: ['Frontend Developer', 'UI / UX Designer'],
+    maxMembers: 4,
+    currentMemberCount: 2,
+    status: 'recruiting',
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    members: [
+      {
+        userId: 'user_rohan_ai',
+        name: 'Rohan Gupta',
+        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+        role: 'AI / ML Engineer',
+        joinedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        isLeader: true,
+      },
+      {
+        userId: 'user_vikram_be',
+        name: 'Vikram Joshi',
+        avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=300&q=80',
+        role: 'Backend Developer',
+        joinedAt: new Date(Date.now() - 86400000).toISOString(),
+        isLeader: false,
+      },
+    ],
+  },
+  {
+    id: 'team-002',
+    eventId: 'evt-001',
+    eventTitle: 'HackNCR 2026: 36-Hour National Collegiate Hackathon',
+    leaderId: 'user_kunal_web3',
+    leaderName: 'Kunal Mehra',
+    leaderAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    teamName: 'ZK-Passport',
+    description: 'Privacy-preserving zero-knowledge identity credential issuance for students and hackathon participants.',
+    requiredRoles: ['Full Stack Developer'],
+    maxMembers: 3,
+    currentMemberCount: 2,
+    status: 'recruiting',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    members: [
+      {
+        userId: 'user_kunal_web3',
+        name: 'Kunal Mehra',
+        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+        role: 'ZK Cryptography',
+        joinedAt: new Date(Date.now() - 86400000).toISOString(),
+        isLeader: true,
+      },
+      {
+        userId: 'user_sanya_ui',
+        name: 'Sanya Verma',
+        avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80',
+        role: 'UI / UX Designer',
+        joinedAt: new Date(Date.now() - 86400000).toISOString(),
+        isLeader: false,
+      },
+    ],
+  },
+  {
+    id: 'team-003',
+    eventId: 'evt-013',
+    eventTitle: 'Delhi-NCR Esports & Indie Game Jam',
+    leaderId: 'user_ananya_games',
+    leaderName: 'Ananya Roy',
+    leaderAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+    teamName: 'PixelForge Studios',
+    description: 'Creating a neon-lit cyberpunk roguelike deckbuilder in Godot Engine over the 48-hour jam.',
+    requiredRoles: ['Pixel Artist', 'Sound Designer'],
+    maxMembers: 4,
+    currentMemberCount: 2,
+    status: 'recruiting',
+    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    members: [
+      {
+        userId: 'user_ananya_games',
+        name: 'Ananya Roy',
+        avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+        role: 'Game Programmer',
+        joinedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        isLeader: true,
+      },
+    ],
+  },
 ];

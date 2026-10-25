@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getDbPool, query } from './index';
-import { DEMO_ATTENDEE, DEMO_ORGANIZER, getInitialEvents, INITIAL_COMMENTS } from '../data/seedData';
+import { DEMO_ATTENDEE, DEMO_ORGANIZER, getInitialEvents, INITIAL_COMMENTS, INITIAL_SQUAD_TEAMS } from '../data/seedData';
 
 export async function initializeDatabase() {
   console.log('🔄 Initializing PostgreSQL database schema...');
@@ -74,8 +74,9 @@ export async function initializeDatabase() {
         `INSERT INTO events (
           id, organizer_id, title, description, category, tags, cover_image,
           start_time, end_time, format, venue_name, address, city,
-          latitude, longitude, is_free, price, capacity, status, featured
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+          latitude, longitude, is_free, price, capacity, status, featured,
+          trust_status, source_type, source_url, registration_deadline
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
         ON CONFLICT (id) DO NOTHING`,
         [
           evt.id,
@@ -98,6 +99,10 @@ export async function initializeDatabase() {
           evt.capacity,
           evt.status,
           evt.featured || false,
+          evt.trustStatus || 'details_reviewed',
+          evt.sourceType || 'direct_published',
+          evt.sourceUrl || null,
+          evt.registrationDeadline || null,
         ]
       );
     }
@@ -126,6 +131,39 @@ export async function initializeDatabase() {
        VALUES ('user_attendee_aarav', 'evt-002')
        ON CONFLICT DO NOTHING`
     );
+
+    // Seed SquadUp Teams
+    for (const team of INITIAL_SQUAD_TEAMS) {
+      await query(
+        `INSERT INTO squad_teams (
+          id, event_id, leader_id, team_name, description, required_roles, max_members, current_members, status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (id) DO NOTHING`,
+        [
+          team.id,
+          team.eventId,
+          team.leaderId,
+          team.teamName || (team as any).name,
+          team.description,
+          team.requiredRoles,
+          team.maxMembers,
+          team.currentMemberCount || (team as any).currentMembers || 1,
+          team.status,
+        ]
+      );
+
+      if (team.members && team.members.length > 0) {
+        for (const m of team.members) {
+          await query(
+            `INSERT INTO squad_members (team_id, user_id, role, is_leader, joined_at)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (team_id, user_id) DO NOTHING`,
+            [team.id, m.userId, m.role, Boolean(m.isLeader), m.joinedAt]
+          );
+        }
+      }
+    }
+    console.log(`✅ Seeded ${INITIAL_SQUAD_TEAMS.length} SquadUp teams.`);
   }
 
   console.log('🎉 Database initialization complete!');

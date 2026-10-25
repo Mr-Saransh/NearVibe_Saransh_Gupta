@@ -92,21 +92,31 @@ export function scoreEventForUser(
     proximityScore = 12; // Moderate fallback when coordinates unavailable
   }
 
-  // 3. Imminence / Date Freshness (Max 15 pts)
+  // 3. Imminence & Registration Deadline Urgency (Max 15 pts)
   let dateScore = 0;
   const now = Date.now();
   const eventTime = new Date(event.startTime).getTime();
   const diffDays = (eventTime - now) / (1000 * 60 * 60 * 24);
 
+  // Check deadline urgency
+  if (event.registrationDeadline) {
+    const deadlineTime = new Date(event.registrationDeadline).getTime();
+    const deadlineDiffHours = (deadlineTime - now) / (1000 * 60 * 60);
+    if (deadlineDiffHours > 0 && deadlineDiffHours <= 48) {
+      dateScore += 15;
+      reasons.push('Registration deadline approaching');
+    }
+  }
+
   if (diffDays >= 0 && diffDays <= 3) {
-    dateScore = 15;
+    dateScore = Math.max(dateScore, 15);
     reasons.push('Happening this week');
   } else if (diffDays > 3 && diffDays <= 7) {
-    dateScore = 12;
+    dateScore = Math.max(dateScore, 12);
   } else if (diffDays > 7 && diffDays <= 14) {
-    dateScore = 8;
+    dateScore = Math.max(dateScore, 8);
   } else if (diffDays > 14) {
-    dateScore = 4;
+    dateScore = Math.max(dateScore, 4);
   } else {
     dateScore = 0; // Past event
   }
@@ -123,6 +133,11 @@ export function scoreEventForUser(
     } else {
       popularityScore = Math.round(fillRatio * 10);
     }
+  }
+
+  // 5. SquadUp & Source verification bonus
+  if (event.category === 'Tech' && event.tags.some(t => t.toLowerCase().includes('hackathon'))) {
+    reasons.push('SquadUp: Teammate matching active');
   }
 
   const totalScore = Math.min(

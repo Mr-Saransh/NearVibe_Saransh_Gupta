@@ -12,11 +12,16 @@ import {
   Globe,
   Radio,
   CheckCircle,
+  ShieldCheck,
+  AlertTriangle,
+  Clock,
+  Info,
 } from 'lucide-react';
 import { EventItem } from '@/types';
 import { formatEventDateTime } from '@/lib/utils/date';
 import { formatDistance } from '@/lib/utils/geo';
 import { useUser } from '@/lib/context/UserContext';
+import { evaluateEventTrust } from '@/lib/utils/trust';
 import confetti from 'canvas-confetti';
 
 interface EventCardProps {
@@ -28,7 +33,9 @@ export default function EventCard({ event }: EventCardProps) {
   const { isEventSaved, toggleSave, isEventRegistered, registerForEvent } = useUser();
   const [imgError, setImgError] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showTrustInfo, setShowTrustInfo] = useState(false);
 
+  const trust = evaluateEventTrust(event);
   const saved = isEventSaved(event.id) || event.isSaved;
   const registered = isEventRegistered(event.id) || event.isRegistered;
 
@@ -150,10 +157,52 @@ export default function EventCard({ event }: EventCardProps) {
           </div>
         )}
 
-        {/* Date and Time */}
-        <div className="flex items-center gap-2 text-xs font-semibold text-rose-600 dark:text-rose-400">
-          <Calendar className="w-4 h-4 shrink-0" />
-          <span>{formatEventDateTime(event.startTime)}</span>
+        {/* Date and Honest Trust Badge Row */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
+            <span>{formatEventDateTime(event.startTime)}</span>
+          </div>
+
+          {/* Truthful Trust Badge with Explanation Popover */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowTrustInfo(!showTrustInfo);
+              }}
+              onMouseEnter={() => setShowTrustInfo(true)}
+              onMouseLeave={() => setShowTrustInfo(false)}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border transition-colors ${trust.badgeColorClass}`}
+              title={trust.explanation}
+            >
+              {trust.status === 'organizer_verified' ? (
+                <ShieldCheck className="w-3 h-3 shrink-0" />
+              ) : trust.status === 'deadline_passed' || trust.status === 'event_ended' ? (
+                <Clock className="w-3 h-3 shrink-0" />
+              ) : trust.status === 'possible_duplicate' || trust.status === 'needs_review' ? (
+                <AlertTriangle className="w-3 h-3 shrink-0" />
+              ) : (
+                <Info className="w-3 h-3 shrink-0" />
+              )}
+              <span>{trust.badgeLabel}</span>
+            </button>
+
+            {/* Popover explaining trust fact */}
+            {showTrustInfo && (
+              <div className="absolute right-0 bottom-full mb-1 z-30 w-52 p-2.5 rounded-xl bg-zinc-900/95 dark:bg-zinc-800/95 text-white text-[11px] leading-relaxed shadow-xl border border-zinc-700/50 backdrop-blur-md pointer-events-none animate-in fade-in duration-200">
+                <p className="font-semibold text-zinc-200 mb-0.5">{trust.badgeLabel}</p>
+                <p className="text-zinc-300">{trust.explanation}</p>
+                {event.sourceUrl && (
+                  <p className="mt-1.5 text-[10px] text-zinc-400 truncate flex items-center gap-1">
+                    <Globe className="w-2.5 h-2.5 shrink-0" /> Source attached
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Title */}
@@ -222,6 +271,10 @@ export default function EventCard({ event }: EventCardProps) {
               <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                 <CheckCircle className="w-3.5 h-3.5" />
                 <span>Registered</span>
+              </span>
+            ) : !trust.canRegister ? (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                {trust.badgeLabel}
               </span>
             ) : (
               <button
